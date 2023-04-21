@@ -1,0 +1,39 @@
+import requests
+import pandas as pd
+import json
+
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+data = {
+    "transactionId": "6",
+    "type": "PURCHASE",
+    "amount": "2000"
+}
+
+url = 'https://d83o3hcaf5.execute-api.us-east-1.amazonaws.com/test/trr'
+query_params = '&'.join([f"{key}={value}" for key, value in data.items()])
+
+
+@app.route('/')
+def index():
+    # API call
+    response = requests.get(url + '?' + query_params)
+
+    # Extract relevant information from the API response
+    json_data = json.loads(response.text.replace("'", "\""))
+    transaction_id = json_data['transactionId']
+    transaction_type = json_data['type']
+    amount = json_data['amount']
+    message = json_data['message']
+
+    # Format output as a string
+    output = json_data
+    return render_template('index.html', print_output=output)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+# sudo lsof -i :5000
+#  sudo kill -9 PID
